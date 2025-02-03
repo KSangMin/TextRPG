@@ -19,7 +19,8 @@
                 Console.WriteLine("1. 상태 보기");
                 Console.WriteLine("2. 인벤토리");
                 Console.WriteLine("3. 상점");
-                Console.WriteLine("4. 휴식하기\n");
+                Console.WriteLine("4. 던전 입장");
+                Console.WriteLine("5. 휴식하기\n");
 
                 game.Select();
             }
@@ -72,7 +73,7 @@
                 health = 100;
                 gold = 1500;
             }
-            
+
             public void PrintState()//상태 보기
             {
                 Console.Clear();
@@ -96,12 +97,12 @@
                 Console.Clear();
                 Console.WriteLine("인벤토리\n보유 중인 아이템을 관리할 수 있습니다.\n");
                 Console.WriteLine("[아이템 목록]");
-                for(int i = 0; i < items.Count; i++)
+                for (int i = 0; i < items.Count; i++)
                 {
                     Item item = items[i];
                     Console.Write($"- ");
                     if (CheckEquip(item)) Console.Write("[E]");
-                    Console.Write($"{item.name, -10} | ");
+                    Console.Write($"{item.name,-10} | ");
                     if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
                     else Console.Write($"방어력 +{item.defense} | ");
                     Console.WriteLine(item.desciption);
@@ -144,22 +145,22 @@
             public void EquipItem(int select)//무기, 방어구 장착 체크
             {
                 Item item = items[select - 1];
-                if(item is Weapon) weapon = (Weapon)item;
-                else if(item is Armor) armor = (Armor)item;
+                if (item is Weapon) weapon = (Weapon)item;
+                else if (item is Armor) armor = (Armor)item;
 
                 AdjustInventory();
             }
 
             public bool CheckEquip(Item item)
             {
-                if(item == weapon || item == armor) return true;
+                if (item == weapon || item == armor) return true;
                 return false;
             }
 
             public bool UseGold(int price)
             {
                 if (price > gold)
-                { 
+                {
                     Console.WriteLine("Gold가 부족합니다.");
                     Thread.Sleep(500);
                     return false;
@@ -170,7 +171,17 @@
                     Console.WriteLine($"{price} Gold를 지불했습니다.");
                     Thread.Sleep(500);
                     return true;
-                } 
+                }
+            }
+
+            public int GetAttack()
+            {
+                return attack + weapon.attack;
+            }
+
+            public int GetArmor()
+            {
+                return defense + armor.defense;
             }
         }
 
@@ -194,19 +205,35 @@
 
         class Weapon : Item
         {
-            public Weapon(string name, int attack, int defense, string description, int price) 
+            public Weapon(string name, int attack, int defense, string description, int price)
                 : base(name, attack, defense, description, price)
             {
 
             }
         }
-        
+
         class Armor : Item
         {
-            public Armor(string name, int attack, int defense, string description, int price) 
+            public Armor(string name, int attack, int defense, string description, int price)
                 : base(name, attack, defense, description, price)
             {
 
+            }
+        }
+
+        class Dungeon
+        {
+            public string name;
+            public int recommend;
+            public int minDamage = 20;
+            public int maxDamage = 35 + 1;
+            public int reward;
+
+            public Dungeon(string name, int recommend, int reward)
+            {
+                this.name = name;
+                this.recommend = recommend;
+                this.reward = reward;
             }
         }
 
@@ -223,6 +250,12 @@
                 , new Weapon("청동 도끼", 5, 0, "어디선가 사용됐던 것 같은 도끼입니다.", 1500)
                 , new Weapon("스파르타의 창", 7, 0, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 2100)
             };
+            private List<Dungeon> _dungeons = new List<Dungeon>
+            {
+                new Dungeon("쉬운 던전", 5, 1000)
+                , new Dungeon("일반 던전", 11, 1700)
+                , new Dungeon("어려운 던전", 17, 2500)
+            };
             private Character _character;
 
             public Game(Character character)
@@ -233,7 +266,7 @@
             public void Select()
             {
                 int select = 0;
-                if (CheckWrongInput(ref select, 1, 4)) return;
+                if (CheckWrongInput(ref select, 1, 5)) return;
 
                 switch (select)
                 {
@@ -247,6 +280,9 @@
                         PrintShop();
                         break;
                     case 4:
+                        SelectDungeon();
+                        break;
+                    case 5:
                         Rest();
                         break;
                 }
@@ -274,7 +310,7 @@
                             break;
                         }
                     }
-                    Console.Write($"{item.desciption, -15} | {(isSelled ? "구매완료" : $"{item.price} G")}\n");
+                    Console.Write($"{item.desciption,-15} | {(isSelled ? "구매완료" : $"{item.price} G")}\n");
                 }
 
                 Console.WriteLine("\n1. 아이템 구매");
@@ -348,11 +384,11 @@
                     _character.items.Add(_shop[select - 1]);
                     _character.items.Last().price = (int)(_character.items.Last().price * 0.85f);
                 }
-                    
+
                 SelectBuyItems();
             }
 
-            public void SelectSellItems()//아이템 판매
+            public void SelectSellItems()//판매할 아이템 선택
             {
                 Console.Clear();
                 Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.");
@@ -380,7 +416,7 @@
                 else SellItem(select);
             }
 
-            public void SellItem(int select)
+            public void SellItem(int select)//아이템 판매
             {
 
                 Item item = _character.items[select - 1];
@@ -388,12 +424,73 @@
                 {
                     if (item is Weapon) _character.weapon = null;
                     if (item is Armor) _character.armor = null;
-                } 
+                }
                 //판매
                 _character.gold += item.price;
                 _character.items.Remove(item);
 
                 SelectSellItems();
+            }
+
+            public void SelectDungeon()//던전 선택
+            {
+                Console.Clear();
+                Console.WriteLine("던전입장\n이곳에서 던전으로 들어가기 전 활동을 할 수 있습니다.\n");
+
+                for (int i = 0; i < _dungeons.Count; i++)
+                {
+                    Dungeon d = _dungeons[i];
+                    Console.WriteLine($"{i + 1}. {d.name, -10} | 방어력 {d.recommend} 이상 권장");
+                }
+                Console.WriteLine("0. 나가기\n");
+
+                int select = 0;
+                if (CheckWrongInput(ref select, 0, _dungeons.Count)) SelectDungeon();
+                if (select == 0) return;
+                else ChallangeDungeon(_dungeons[select - 1]);
+            }
+
+            public void ChallangeDungeon(Dungeon d)//던전 도전
+            {
+                if(d.recommend > _character.GetArmor() && new Random().Next(0, 10) < 4) DungeonFail(d);
+                else DungeonSuccess(d);
+            }
+
+            public void DungeonSuccess(Dungeon d)
+            {
+                Console.Clear();
+                Console.WriteLine($"던전 클리어\n축하드립니다!\n{d.name}을 클리어했습니다.\n");
+                Console.WriteLine("[탐험 결과]");
+                Console.Write($"체력 {_character.health} -> ");
+                int adjust = d.recommend - _character.GetArmor();
+                _character.health -= new Random().Next(d.minDamage + adjust, d.maxDamage + adjust);
+                Console.WriteLine(_character.health);
+                Console.Write($"Gold {_character.gold} -> ");
+                int additionalRatio = new Random().Next(_character.GetAttack(), _character.GetAttack() * 2 + 1);
+                float ratio = 1f + additionalRatio / 100f;
+                _character.gold += (int)(d.reward * ratio);
+                Console.WriteLine(_character.gold);
+
+                Console.WriteLine("\n0. 나가기");
+
+                int select = 0;
+                if (CheckWrongInput(ref select, 0, _dungeons.Count)) SelectDungeon();
+                if (select == 0) return;
+            }
+
+            public void DungeonFail(Dungeon d)
+            {
+                Console.Clear();
+                Console.WriteLine($"던전 도전 실패\n안타깝네요..\n{d.name} 클리어에 실패했습니다.\n");
+                Console.WriteLine("[탐험 결과]");
+                Console.WriteLine($"체력 {_character.health} -> {_character.health / 2}");
+                _character.health /= 2;
+
+                Console.WriteLine("\n0. 나가기");
+
+                int select = 0;
+                if (CheckWrongInput(ref select, 0, _dungeons.Count)) SelectDungeon();
+                if (select == 0) return;
             }
 
             public void Rest()//휴식하기
@@ -412,7 +509,7 @@
                         Rest();
                         break;
                     case 1:
-                        if(_character.UseGold(500))
+                        if (_character.UseGold(500))
                         {
                             _character.health = Math.Max(_character.health + 50, 100);
                             Console.WriteLine("체력이 회복되었습니다.");
