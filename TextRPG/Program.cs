@@ -49,15 +49,16 @@
         {
             public List<Item> items = new List<Item>
             {
-                new Item("천 옷", false, 0, 5, "활동성이 좋은 옷입니다.")
-                , new Item("나무 몽둥이", true, 2, 0, "두꺼운 나무 몽둥이입니다.")
-                , new Item("낡은 검", true, 2, 0, "쉽게 볼 수 있는 낡은 검입니다.")
+                new Item("천 옷", false, 0, 2, "활동성이 좋은 옷입니다.")
+                , new Item("나무 몽둥이", true, 1, 0, "두꺼운 나무 몽둥이입니다.")
             };
             public int level;
             public string name;
             public string classType;
             public int attack;
+            public int additionalAttack;
             public int defense;
+            public int additionalDefense;
             public int health;
             public int gold;
 
@@ -67,29 +68,21 @@
                 this.name = name;
                 classType = "전사";
                 attack = 10;
+                additionalAttack = 0;
                 defense = 5;
+                additionalDefense = 0;
                 health = 100;
                 gold = 1500;
             }
-
+            
             public void PrintState()
             {
-                int itemAttack = 0, itemDefense = 0;
-                foreach (Item item in items)
-                {
-                    if (item.isEquipped)
-                    {
-                        itemAttack += item.attack;
-                        itemDefense += item.defense;
-                    }
-                }
-
                 Console.Clear();
                 Console.WriteLine("상태 보기\n캐릭터의 정보가 표시됩니다.\n");
                 Console.WriteLine($"Lv. {level:D2}");
                 Console.WriteLine($"{name} ( {classType} )");
-                Console.WriteLine($"공격력: {attack}{(itemAttack > 0 ? $" (+{itemAttack})" : "")}");
-                Console.WriteLine($"방어력: {defense}{(itemDefense > 0 ? $" (+{itemDefense})" : "")}");
+                Console.WriteLine($"공격력: {attack}{(additionalAttack > 0 ? $" (+{additionalAttack})" : "")}");
+                Console.WriteLine($"방어력: {defense}{(additionalDefense > 0 ? $" (+{additionalDefense})" : "")}");
                 Console.WriteLine($"체 력: {health}");
                 Console.WriteLine($"Gold: {gold}G");
                 Console.WriteLine();
@@ -103,29 +96,65 @@
             public void PrintInventory()
             {
                 Console.Clear();
-                Console.WriteLine("인벤토리\n보유 중인 아이템을 관리할 수 있습니다.");
-                Console.WriteLine("해당 숫자 아이템을 선택해 착용/해제할 수 있습니다.\n");
+                Console.WriteLine("인벤토리\n보유 중인 아이템을 관리할 수 있습니다.\n");
                 Console.WriteLine("[아이템 목록]");
                 for(int i = 0; i < items.Count; i++)
                 {
                     Item item = items[i];
-                    Console.Write($"- {i + 1} ");
+                    Console.Write($"- ");
                     if (item.isEquipped) Console.Write("[E]");
                     Console.Write($"{item.name, -10} | ");
                     if (item.isWeapon) Console.Write($"공격력 +{item.attack} | ");
                     else Console.Write($"방어력 +{item.defense} | ");
                     Console.WriteLine(item.desciption);
                 }
-                Console.WriteLine();
-                Console.WriteLine("0. 나가기");
+
+                Console.WriteLine("\n1. 장착 관리");
+                Console.WriteLine("2. 나가기");
 
                 int select = -1;
-                if (CheckWrongInput(ref select, 0, items.Count)) PrintInventory();
+                if (CheckWrongInput(ref select, 1, 2)) PrintInventory();
+                if (select == 2) return;
+                else AdjustInventory();
+            }
+
+            public void AdjustInventory()
+            {
+                Console.Clear();
+                Console.WriteLine("인벤토리 - 장착 관리\n보유 중인 아이템을 관리할 수 있습니다.");
+                Console.WriteLine("해당 숫자 아이템을 선택해 착용/해제할 수 있습니다.\n");
+                Console.WriteLine("[아이템 목록]");
+                for (int i = 0; i < items.Count; i++)
+                {
+                    Item item = items[i];
+                    Console.Write($"- {i + 1} ");
+                    if (item.isEquipped) Console.Write("[E]");
+                    Console.Write($"{item.name,-10} | ");
+                    if (item.isWeapon) Console.Write($"공격력 +{item.attack} | ");
+                    else Console.Write($"방어력 +{item.defense} | ");
+                    Console.WriteLine(item.desciption);
+                }
+
+                Console.WriteLine("\n0. 나가기");
+
+                int select = -1;
+                if (CheckWrongInput(ref select, 0, items.Count)) AdjustInventory();
                 if (select == 0) return;
                 else
                 {
-                    items[select - 1].isEquipped = !items[select - 1].isEquipped;
-                    PrintInventory();
+                    Item item = items[select - 1];
+                    item.isEquipped = !item.isEquipped;
+                    if (item.isEquipped)
+                    {
+                        additionalAttack += item.attack;
+                        additionalDefense += item.defense;
+                    }
+                    else
+                    {
+                        additionalAttack -= item.attack;
+                        additionalDefense -= item.defense;
+                    }
+                    AdjustInventory();
                 }
             }
 
@@ -181,11 +210,11 @@
         {
             private List<Item> _shop = new List<Item>
             {
-                new Item("천 옷", false, 0, 5, "활동성이 좋은 옷입니다.", 500)
+                new Item("천 옷", false, 0, 2, "활동성이 좋은 옷입니다.", 500)
                 , new Item("수련자 갑옷", false, 0, 5, "수련에 도움을 주는 갑옷입니다.", 1000)
                 , new Item("무쇠갑옷", false, 0, 9, "무쇠로 만들어져 튼튼한 갑옷입니다.", 2500)
                 , new Item("스파르타의 갑옷", false, 0, 15, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 3500)
-                , new Item("나무 몽둥이", true, 2, 0, "두꺼운 나무 몽둥이입니다.", 300)
+                , new Item("나무 몽둥이", true, 1, 0, "두꺼운 나무 몽둥이입니다.", 300)
                 , new Item("낡은 검", true, 2, 0, "쉽게 볼 수 있는 낡은 검입니다.", 600)
                 , new Item("청동 도끼", true, 5, 0, "어디선가 사용됐던 것 같은 도끼입니다.", 1500)
                 , new Item("스파르타의 창", true, 7, 0, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 2100)
