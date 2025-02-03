@@ -49,16 +49,16 @@
         {
             public List<Item> items = new List<Item>
             {
-                new Item("천 옷", false, 0, 2, "활동성이 좋은 옷입니다.", 425)
-                , new Item("나무 몽둥이", true, 1, 0, "두꺼운 나무 몽둥이입니다.", 255)
+                new Armor("천 옷", 0, 2, "활동성이 좋은 옷입니다.", 425)
+                , new Weapon("나무 몽둥이", 1, 0, "두꺼운 나무 몽둥이입니다.", 255)
             };
+            public Weapon weapon;
+            public Armor armor;
             public int level;
             public string name;
             public string classType;
             public int attack;
-            public int additionalAttack;//아이템
             public int defense;
-            public int additionalDefense;//아이템
             public int health;
             public int gold;
 
@@ -68,9 +68,7 @@
                 this.name = name;
                 classType = "전사";
                 attack = 10;
-                additionalAttack = 0;
                 defense = 5;
-                additionalDefense = 0;
                 health = 100;
                 gold = 1500;
             }
@@ -81,8 +79,8 @@
                 Console.WriteLine("상태 보기\n캐릭터의 정보가 표시됩니다.\n");
                 Console.WriteLine($"Lv. {level:D2}");
                 Console.WriteLine($"{name} ( {classType} )");
-                Console.WriteLine($"공격력: {attack}{(additionalAttack > 0 ? $" (+{additionalAttack})" : "")}");
-                Console.WriteLine($"방어력: {defense}{(additionalDefense > 0 ? $" (+{additionalDefense})" : "")}");
+                Console.WriteLine($"공격력: {attack}{(weapon is not null ? $" (+{weapon.attack})" : "")}");
+                Console.WriteLine($"방어력: {defense}{(armor is not null ? $" (+{armor.defense})" : "")}");
                 Console.WriteLine($"체 력: {health}");
                 Console.WriteLine($"Gold: {gold}G");
 
@@ -102,9 +100,9 @@
                 {
                     Item item = items[i];
                     Console.Write($"- ");
-                    if (item.isEquipped) Console.Write("[E]");
+                    if (CheckEquip(item)) Console.Write("[E]");
                     Console.Write($"{item.name, -10} | ");
-                    if (item.isWeapon) Console.Write($"공격력 +{item.attack} | ");
+                    if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
                     else Console.Write($"방어력 +{item.defense} | ");
                     Console.WriteLine(item.desciption);
                 }
@@ -128,9 +126,9 @@
                 {
                     Item item = items[i];
                     Console.Write($"- {i + 1} ");
-                    if (item.isEquipped) Console.Write("[E]");
+                    if (CheckEquip(item)) Console.Write("[E]");
                     Console.Write($"{item.name,-10} | ");
-                    if (item.isWeapon) Console.Write($"공격력 +{item.attack} | ");
+                    if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
                     else Console.Write($"방어력 +{item.defense} | ");
                     Console.WriteLine(item.desciption);
                 }
@@ -140,22 +138,22 @@
                 int select = 0;
                 if (CheckWrongInput(ref select, 0, items.Count)) AdjustInventory();
                 if (select == 0) PrintInventory();
-                else
-                {
-                    Item item = items[select - 1];
-                    item.isEquipped = !item.isEquipped;
-                    if (item.isEquipped)
-                    {
-                        additionalAttack += item.attack;
-                        additionalDefense += item.defense;
-                    }
-                    else
-                    {
-                        additionalAttack -= item.attack;
-                        additionalDefense -= item.defense;
-                    }
-                    AdjustInventory();
-                }
+                else EquipItem(select);
+            }
+
+            public void EquipItem(int select)//무기, 방어구 장착 체크
+            {
+                Item item = items[select - 1];
+                if(item is Weapon) weapon = (Weapon)item;
+                else if(item is Armor) armor = (Armor)item;
+
+                AdjustInventory();
+            }
+
+            public bool CheckEquip(Item item)
+            {
+                if(item == weapon || item == armor) return true;
+                return false;
             }
 
             public bool UseGold(int price)
@@ -178,27 +176,15 @@
 
         class Item
         {
-            public bool isEquipped = false;
             public string name;
-            public bool isWeapon;
             public int attack;
             public int defense;
             public string desciption;
             public int price = 0;
 
-            public Item(string name, bool isWeapon, int attack, int defense, string description)
+            public Item(string name, int attack, int defense, string description, int price)
             {
                 this.name = name;
-                this.isWeapon = isWeapon;
-                this.attack = attack;
-                this.defense = defense;
-                this.desciption = description;
-            }
-
-            public Item(string name, bool isWeapon, int attack, int defense, string description, int price)
-            {
-                this.name = name;
-                this.isWeapon = isWeapon;
                 this.attack = attack;
                 this.defense = defense;
                 this.desciption = description;
@@ -206,18 +192,36 @@
             }
         }
 
+        class Weapon : Item
+        {
+            public Weapon(string name, int attack, int defense, string description, int price) 
+                : base(name, attack, defense, description, price)
+            {
+
+            }
+        }
+        
+        class Armor : Item
+        {
+            public Armor(string name, int attack, int defense, string description, int price) 
+                : base(name, attack, defense, description, price)
+            {
+
+            }
+        }
+
         class Game
         {
             private List<Item> _shop = new List<Item>
             {
-                new Item("천 옷", false, 0, 2, "활동성이 좋은 옷입니다.", 500)
-                , new Item("수련자 갑옷", false, 0, 5, "수련에 도움을 주는 갑옷입니다.", 1000)
-                , new Item("무쇠갑옷", false, 0, 9, "무쇠로 만들어져 튼튼한 갑옷입니다.", 2500)
-                , new Item("스파르타의 갑옷", false, 0, 15, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 3500)
-                , new Item("나무 몽둥이", true, 1, 0, "두꺼운 나무 몽둥이입니다.", 300)
-                , new Item("낡은 검", true, 2, 0, "쉽게 볼 수 있는 낡은 검입니다.", 600)
-                , new Item("청동 도끼", true, 5, 0, "어디선가 사용됐던 것 같은 도끼입니다.", 1500)
-                , new Item("스파르타의 창", true, 7, 0, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 2100)
+                new Armor("천 옷", 0, 2, "활동성이 좋은 옷입니다.", 500)
+                , new Armor("수련자 갑옷", 0, 5, "수련에 도움을 주는 갑옷입니다.", 1000)
+                , new Armor("무쇠갑옷", 0, 9, "무쇠로 만들어져 튼튼한 갑옷입니다.", 2500)
+                , new Armor("스파르타의 갑옷", 0, 15, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 3500)
+                , new Weapon("나무 몽둥이", 1, 0, "두꺼운 나무 몽둥이입니다.", 300)
+                , new Weapon("낡은 검", 2, 0, "쉽게 볼 수 있는 낡은 검입니다.", 600)
+                , new Weapon("청동 도끼", 5, 0, "어디선가 사용됐던 것 같은 도끼입니다.", 1500)
+                , new Weapon("스파르타의 창", 7, 0, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 2100)
             };
             private Character _character;
 
@@ -259,7 +263,7 @@
                 {
                     Item item = _shop[i];
                     Console.Write($"- {item.name,-10} | ");
-                    if (item.isWeapon) Console.Write($"공격력 +{item.attack} | ");
+                    if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
                     else Console.Write($"방어력 +{item.defense} | ");
                     bool isSelled = false;
                     foreach (Item eq in _character.items)
@@ -304,7 +308,7 @@
                 {
                     Item item = _shop[i];
                     Console.Write($"- {i + 1} {item.name,-10} | ");
-                    if (item.isWeapon) Console.Write($"공격력 +{item.attack} | ");
+                    if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
                     else Console.Write($"방어력 +{item.defense} | ");
                     bool isSelled = false;
                     foreach (Item eq in _character.items)
@@ -362,7 +366,7 @@
                     Console.Write($"- {i + 1} ");
                     //if (item.isEquipped) Console.Write("[E]");
                     Console.Write($"{item.name,-10} | ");
-                    if (item.isWeapon) Console.Write($"공격력 +{item.attack} | ");
+                    if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
                     else Console.Write($"방어력 +{item.defense} | ");
                     Console.Write(item.desciption + " | ");
                     Console.WriteLine(item.price + " G");
@@ -380,12 +384,11 @@
             {
 
                 Item item = _character.items[select - 1];
-                if (item.isEquipped)//장착해제
+                if (_character.CheckEquip(item))
                 {
-                    _character.additionalAttack -= item.attack;
-                    _character.additionalDefense -= item.defense;
-                    item.isEquipped = false;
-                }
+                    if (item is Weapon) _character.weapon = null;
+                    if (item is Armor) _character.armor = null;
+                } 
                 //판매
                 _character.gold += item.price;
                 _character.items.Remove(item);
