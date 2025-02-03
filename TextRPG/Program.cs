@@ -49,8 +49,8 @@
         {
             public List<Item> items = new List<Item>
             {
-                new Item("천 옷", false, 0, 2, "활동성이 좋은 옷입니다.")
-                , new Item("나무 몽둥이", true, 1, 0, "두꺼운 나무 몽둥이입니다.")
+                new Item("천 옷", false, 0, 2, "활동성이 좋은 옷입니다.", 425)
+                , new Item("나무 몽둥이", true, 1, 0, "두꺼운 나무 몽둥이입니다.", 255)
             };
             public int level;
             public string name;
@@ -274,21 +274,25 @@
                 }
 
                 Console.WriteLine("\n1. 아이템 구매");
+                Console.WriteLine("2. 아이템 판매");
                 Console.WriteLine("0. 나가기");
 
                 int select = 0;
-                if (CheckWrongInput(ref select, 0, 1)) PrintShop();
+                if (CheckWrongInput(ref select, 0, 2)) PrintShop();
                 switch (select)
                 {
                     case 0:
                         return;
                     case 1:
-                        SelectItems();
+                        SelectBuyItems();
+                        break;
+                    case 2:
+                        SelectSellItems();
                         break;
                 }
             }
 
-            public void SelectItems()//구매할 아이템 선택
+            public void SelectBuyItems()//구매할 아이템 선택
             {
                 Console.Clear();
                 Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.");
@@ -317,7 +321,7 @@
                 Console.WriteLine("\n0. 나가기");
 
                 int select = 0;
-                if (CheckWrongInput(ref select, 0, _shop.Count)) SelectItems();
+                if (CheckWrongInput(ref select, 0, _shop.Count)) SelectBuyItems();
                 if (select == 0) PrintShop();
                 else BuyItem(select);
             }
@@ -335,8 +339,58 @@
                         break;
                     }
                 }
-                if (!isSelled && _character.UseGold(_shop[select - 1].price)) _character.items.Add(_shop[select - 1]);
-                SelectItems();
+                if (!isSelled && _character.UseGold(_shop[select - 1].price))
+                {
+                    _character.items.Add(_shop[select - 1]);
+                    _character.items.Last().price = (int)(_character.items.Last().price * 0.85f);
+                }
+                    
+                SelectBuyItems();
+            }
+
+            public void SelectSellItems()//아이템 판매
+            {
+                Console.Clear();
+                Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.");
+                Console.WriteLine("해당 숫자 아이템을 선택해 판매할 수 있습니다.\n");
+                Console.WriteLine("[보유 골드]");
+                Console.WriteLine(_character.gold + " G\n");
+                Console.WriteLine("[아이템 목록]");
+                for (int i = 0; i < _character.items.Count; i++)
+                {
+                    Item item = _character.items[i];
+                    Console.Write($"- {i + 1} ");
+                    //if (item.isEquipped) Console.Write("[E]");
+                    Console.Write($"{item.name,-10} | ");
+                    if (item.isWeapon) Console.Write($"공격력 +{item.attack} | ");
+                    else Console.Write($"방어력 +{item.defense} | ");
+                    Console.Write(item.desciption + " | ");
+                    Console.WriteLine(item.price + " G");
+                }
+
+                Console.WriteLine("\n0. 나가기");
+
+                int select = 0;
+                if (CheckWrongInput(ref select, 0, _character.items.Count)) SelectSellItems();
+                if (select == 0) PrintShop();
+                else SellItem(select);
+            }
+
+            public void SellItem(int select)
+            {
+
+                Item item = _character.items[select - 1];
+                if (item.isEquipped)//장착해제
+                {
+                    _character.additionalAttack -= item.attack;
+                    _character.additionalDefense -= item.defense;
+                    item.isEquipped = false;
+                }
+                //판매
+                _character.gold += item.price;
+                _character.items.Remove(item);
+
+                SelectSellItems();
             }
 
             public void Rest()//휴식하기
