@@ -6,7 +6,6 @@
         {
             Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
             Console.Write("당신의 이름을 알려 주세요: ");
-            
             string name = Console.ReadLine();
             Character user = new Character(name);
             Game game = new Game(user);
@@ -39,6 +38,12 @@
 
         class Character
         {
+            private Item[] items =
+            {
+                new Item("무쇠갑옷", false, 0, 5, "무쇠로 만들어져 튼튼한 갑옷입니다.")
+                , new Item("스파르타의 창", true, 7, 0, "스파르타의 전사들이 사용했다는 전설의 창입니다.")
+                , new Item("낡은 검", true, 2, 0, "쉽게 볼 수 있는 낡은 검입니다.")
+            };
             private int _level;
             private string _name;
             private string _classType;
@@ -75,6 +80,52 @@
                 else return;
             }
 
+            public void PrintInventory()
+            {
+                Console.Clear();
+                Console.WriteLine("[아이템 목록]");
+                for(int i = 0; i < items.Length; i++)
+                {
+                    Item item = items[i];
+                    Console.Write($"- {i + 1} ");
+                    if (item.isEquipped) Console.Write("[E]");
+                    Console.Write($"{item.name, -10} | ");
+                    if (item.isWeapon) Console.Write($"공격력 +{item.attack} | ");
+                    else Console.Write($"방어력 +{item.defense} | ");
+                    Console.WriteLine(item.desciption);
+                }
+                Console.WriteLine();
+                Console.WriteLine("0. 나가기");
+                Console.WriteLine("그 외. 해당 숫자 아이템 착용/해제하기");
+
+                int select = -1;
+                if (CheckWrongInput(ref select, 0, items.Length)) PrintInventory();
+                if (select == 0) return;
+                else
+                {
+                    items[select - 1].isEquipped = !items[select - 1].isEquipped;
+                    PrintInventory();
+                }
+            }
+        }
+
+        class Item
+        {
+            public bool isEquipped = false;
+            public string name;
+            public bool isWeapon;
+            public int attack;
+            public int defense;
+            public string desciption;
+
+            public Item(string name, bool isWeapon, int attack, int defense, string description)
+            {
+                this.name = name;
+                this.isWeapon = isWeapon;
+                this.attack = attack;
+                this.defense = defense;
+                this.desciption = description;
+            }
         }
 
         class Game
@@ -103,6 +154,7 @@
                         _character.PrintState();
                         return;
                     case 2:
+                        _character.PrintInventory();
                         break;
                     case 3:
                         break;
