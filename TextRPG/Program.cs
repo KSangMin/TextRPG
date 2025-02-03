@@ -56,9 +56,10 @@
             public Weapon weapon;
             public Armor armor;
             public int level;
+            public int clear;
             public string name;
             public string classType;
-            public int attack;
+            public float attack;
             public int defense;
             public int health;
             public int gold;
@@ -66,6 +67,7 @@
             public Character(string name)
             {
                 level = 1;
+                clear = 0;
                 this.name = name;
                 classType = "전사";
                 attack = 10;
@@ -176,12 +178,25 @@
 
             public int GetAttack()
             {
-                return attack + weapon.attack;
+                return weapon is null ? (int)attack : (int)(attack + weapon.attack);
             }
 
             public int GetArmor()
             {
-                return defense + armor.defense;
+                return armor is null ? defense : defense + armor.defense;
+            }
+
+            public bool IsLevelUp()
+            {
+                if(level <= clear)
+                {
+                    clear = 0;
+                    level++;
+                    attack += 0.5f;
+                    defense += 1;
+                    return true;
+                }
+                return false;
             }
         }
 
@@ -470,6 +485,13 @@
                 float ratio = 1f + additionalRatio / 100f;
                 _character.gold += (int)(d.reward * ratio);
                 Console.WriteLine(_character.gold);
+                _character.clear++;
+                if(_character.IsLevelUp())
+                {
+                    Console.WriteLine($"레벨 {_character.level - 1} -> {_character.level}");
+                    Console.WriteLine($"공격력 {_character.attack - 0.5f} -> {_character.attack}");
+                    Console.WriteLine($"방어력 {_character.defense - 1} -> {_character.defense}");
+                }
 
                 Console.WriteLine("\n0. 나가기");
 
