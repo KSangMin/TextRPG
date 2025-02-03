@@ -65,11 +65,21 @@
 
             public void PrintState()
             {
+                int itemAttack = 0, itemDefense = 0;
+                foreach (Item item in items)
+                {
+                    if (item.isEquipped)
+                    {
+                        itemAttack += item.attack;
+                        itemDefense += item.defense;
+                    }
+                }
+
                 Console.Clear();
                 Console.WriteLine($"Lv. {_level:D2}");
                 Console.WriteLine($"{_name} ({_classType})");
-                Console.WriteLine($"공격력: {_attack}");
-                Console.WriteLine($"방어력: {_defense}");
+                Console.WriteLine($"공격력: {_attack}{(itemAttack > 0 ? $" (+{itemAttack})" : "")}");
+                Console.WriteLine($"방어력: {_defense}{(itemDefense > 0 ? $" (+{itemDefense})" : "")}");
                 Console.WriteLine($"체 력: {_health}");
                 Console.WriteLine($"Gold: {_gold}G");
                 Console.WriteLine();
