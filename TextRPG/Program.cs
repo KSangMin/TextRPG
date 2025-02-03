@@ -13,6 +13,14 @@
             Console.WriteLine("환영합니다!");
             while (true)
             {
+                Console.Clear();
+                Console.WriteLine("이곳에서 던전으로 들어가기 전 활동을 할 수 있습니다.");
+                Console.WriteLine();
+                Console.WriteLine("1. 상태 보기");
+                Console.WriteLine("2. 인벤토리");
+                Console.WriteLine("3. 상점");
+                Console.WriteLine("4. 휴식하기\n");
+
                 game.Select();
             }
         }
@@ -77,7 +85,7 @@
                 }
 
                 Console.Clear();
-                Console.WriteLine("캐릭터의 정보가 표시됩니다.\n");
+                Console.WriteLine("상태 보기\n캐릭터의 정보가 표시됩니다.\n");
                 Console.WriteLine($"Lv. {level:D2}");
                 Console.WriteLine($"{name} ( {classType} )");
                 Console.WriteLine($"공격력: {attack}{(itemAttack > 0 ? $" (+{itemAttack})" : "")}");
@@ -95,7 +103,7 @@
             public void PrintInventory()
             {
                 Console.Clear();
-                Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
+                Console.WriteLine("인벤토리\n보유 중인 아이템을 관리할 수 있습니다.");
                 Console.WriteLine("해당 숫자 아이템을 선택해 착용/해제할 수 있습니다.\n");
                 Console.WriteLine("[아이템 목록]");
                 for(int i = 0; i < items.Count; i++)
@@ -132,7 +140,7 @@
                 else
                 {
                     gold -= price;
-                    Console.WriteLine("구매를 완료했습니다.");
+                    Console.WriteLine($"{price} Gold를 지불했습니다.");
                     Thread.Sleep(500);
                     return true;
                 } 
@@ -191,15 +199,8 @@
 
             public void Select()
             {
-                Console.Clear();
-                Console.WriteLine("이곳에서 던전으로 들어가기 전 활동을 할 수 있습니다.");
-                Console.WriteLine();
-                Console.WriteLine("1. 상태 보기");
-                Console.WriteLine("2. 인벤토리");
-                Console.WriteLine("3. 상점\n");
-
                 int select = -1;
-                if (CheckWrongInput(ref select, 1, 3)) return;
+                if (CheckWrongInput(ref select, 1, 4)) return;
 
                 switch (select)
                 {
@@ -212,13 +213,16 @@
                     case 3:
                         PrintShop();
                         break;
+                    case 4:
+                        Rest();
+                        break;
                 }
             }
 
             public void PrintShop()
             {
                 Console.Clear();
-                Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
+                Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.");
                 Console.WriteLine("해당 숫자 아이템을 선택해 구매할 수 있습니다.\n");
                 Console.WriteLine("[보유 골드]");
                 Console.WriteLine(_character.gold + " G\n");
@@ -261,6 +265,31 @@
                     }
                     if(!isSelled && _character.UseGold(_shop[select- 1].price)) _character.items.Add(_shop[select - 1]);
                     PrintShop();
+                }
+            }
+
+            public void Rest()
+            {
+                Console.Clear();
+                Console.Write("휴식하기\n500 G 를 내면 체력을 회복할 수 있습니다.");
+                Console.WriteLine($" (보유 골드 : {_character.gold} G)\n");
+                Console.WriteLine("1. 휴식하기");
+                Console.WriteLine("0, 나가기\n");
+
+                int select = -1;
+                if (CheckWrongInput(ref select, 0, 1)) Rest();
+                switch (select)
+                {
+                    case 0:
+                        return;
+                    case 1:
+                        if(_character.UseGold(500))
+                        {
+                            _character.health = Math.Max(_character.health + 50, 100);
+                            Console.WriteLine("체력이 회복되었습니다.");
+                            Thread.Sleep(500);
+                        }
+                        break;
                 }
             }
         }
