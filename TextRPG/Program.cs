@@ -14,8 +14,8 @@
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("이곳에서 던전으로 들어가기 전 활동을 할 수 있습니다.");
-                Console.WriteLine();
+                Console.WriteLine("이곳에서 던전으로 들어가기 전 활동을 할 수 있습니다.\n");
+
                 Console.WriteLine("1. 상태 보기");
                 Console.WriteLine("2. 인벤토리");
                 Console.WriteLine("3. 상점");
@@ -25,7 +25,7 @@
             }
         }
 
-        public static bool CheckWrongInput(ref int select, int minN, int maxN)
+        public static bool CheckWrongInput(ref int select, int minN, int maxN)//입력 예외처리
         {
             Console.Write("\n원하시는 행동을 입력해주세요.(숫자로 입력): ");
             bool rightInput = int.TryParse(Console.ReadLine(), out select);
@@ -56,9 +56,9 @@
             public string name;
             public string classType;
             public int attack;
-            public int additionalAttack;
+            public int additionalAttack;//아이템
             public int defense;
-            public int additionalDefense;
+            public int additionalDefense;//아이템
             public int health;
             public int gold;
 
@@ -75,7 +75,7 @@
                 gold = 1500;
             }
             
-            public void PrintState()
+            public void PrintState()//상태 보기
             {
                 Console.Clear();
                 Console.WriteLine("상태 보기\n캐릭터의 정보가 표시됩니다.\n");
@@ -85,15 +85,15 @@
                 Console.WriteLine($"방어력: {defense}{(additionalDefense > 0 ? $" (+{additionalDefense})" : "")}");
                 Console.WriteLine($"체 력: {health}");
                 Console.WriteLine($"Gold: {gold}G");
-                Console.WriteLine();
-                Console.WriteLine("0. 나가기");
 
-                int select = -1;
+                Console.WriteLine("\n0. 나가기");
+
+                int select = 0;
                 if (CheckWrongInput(ref select, 0, 0)) PrintState();
                 else return;
             }
 
-            public void PrintInventory()
+            public void PrintInventory()//인벤토리
             {
                 Console.Clear();
                 Console.WriteLine("인벤토리\n보유 중인 아이템을 관리할 수 있습니다.\n");
@@ -110,15 +110,15 @@
                 }
 
                 Console.WriteLine("\n1. 장착 관리");
-                Console.WriteLine("2. 나가기");
+                Console.WriteLine("0. 나가기");
 
-                int select = -1;
-                if (CheckWrongInput(ref select, 1, 2)) PrintInventory();
-                if (select == 2) return;
+                int select = 0;
+                if (CheckWrongInput(ref select, 0, 1)) PrintInventory();
+                if (select == 0) return;
                 else AdjustInventory();
             }
 
-            public void AdjustInventory()
+            public void AdjustInventory()//인벤토리 - 장착 관리
             {
                 Console.Clear();
                 Console.WriteLine("인벤토리 - 장착 관리\n보유 중인 아이템을 관리할 수 있습니다.");
@@ -137,9 +137,9 @@
 
                 Console.WriteLine("\n0. 나가기");
 
-                int select = -1;
+                int select = 0;
                 if (CheckWrongInput(ref select, 0, items.Count)) AdjustInventory();
-                if (select == 0) return;
+                if (select == 0) PrintInventory();
                 else
                 {
                     Item item = items[select - 1];
@@ -228,7 +228,7 @@
 
             public void Select()
             {
-                int select = -1;
+                int select = 0;
                 if (CheckWrongInput(ref select, 1, 4)) return;
 
                 switch (select)
@@ -248,7 +248,47 @@
                 }
             }
 
-            public void PrintShop()
+            public void PrintShop()//상점
+            {
+                Console.Clear();
+                Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.\n");
+                Console.WriteLine("[보유 골드]");
+                Console.WriteLine(_character.gold + " G\n");
+                Console.WriteLine("[아이템 목록]");
+                for (int i = 0; i < _shop.Count; i++)
+                {
+                    Item item = _shop[i];
+                    Console.Write($"- {item.name,-10} | ");
+                    if (item.isWeapon) Console.Write($"공격력 +{item.attack} | ");
+                    else Console.Write($"방어력 +{item.defense} | ");
+                    bool isSelled = false;
+                    foreach (Item eq in _character.items)
+                    {
+                        if (eq.name == item.name)
+                        {
+                            isSelled = true;
+                            break;
+                        }
+                    }
+                    Console.Write($"{item.desciption, -15} | {(isSelled ? "구매완료" : $"{item.price} G")}\n");
+                }
+
+                Console.WriteLine("\n1. 아이템 구매");
+                Console.WriteLine("0. 나가기");
+
+                int select = 0;
+                if (CheckWrongInput(ref select, 0, 1)) PrintShop();
+                switch (select)
+                {
+                    case 0:
+                        return;
+                    case 1:
+                        SelectItems();
+                        break;
+                }
+            }
+
+            public void SelectItems()//구매할 아이템 선택
             {
                 Console.Clear();
                 Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.");
@@ -271,33 +311,35 @@
                             break;
                         }
                     }
-                    Console.Write($"{item.desciption, -15} | {(isSelled ? "구매완료" : $"{item.price} G")}\n");
+                    Console.Write($"{item.desciption,-15} | {(isSelled ? "구매완료" : $"{item.price} G")}\n");
                 }
-                Console.WriteLine();
-                Console.WriteLine("0. 나가기");
 
-                int select = -1;
-                if (CheckWrongInput(ref select, 0, _shop.Count)) PrintShop();
-                if (select == 0) return;
-                else
-                {
-                    bool isSelled = false;
-                    foreach (Item eq in _character.items)
-                    {
-                        if (eq.name == _shop[select - 1].name)
-                        {
-                            isSelled = true;
-                            Console.WriteLine("이미 구매한 아이템입니다.");
-                            Thread.Sleep(500);
-                            break;
-                        }
-                    }
-                    if(!isSelled && _character.UseGold(_shop[select- 1].price)) _character.items.Add(_shop[select - 1]);
-                    PrintShop();
-                }
+                Console.WriteLine("\n0. 나가기");
+
+                int select = 0;
+                if (CheckWrongInput(ref select, 0, _shop.Count)) SelectItems();
+                if (select == 0) PrintShop();
+                else BuyItem(select);
             }
 
-            public void Rest()
+            public void BuyItem(int select)//아이템 구매
+            {
+                bool isSelled = false;
+                foreach (Item eq in _character.items)
+                {
+                    if (eq.name == _shop[select - 1].name)
+                    {
+                        isSelled = true;
+                        Console.WriteLine("이미 구매한 아이템입니다.");
+                        Thread.Sleep(500);
+                        break;
+                    }
+                }
+                if (!isSelled && _character.UseGold(_shop[select - 1].price)) _character.items.Add(_shop[select - 1]);
+                SelectItems();
+            }
+
+            public void Rest()//휴식하기
             {
                 Console.Clear();
                 Console.Write("휴식하기\n500 G 를 내면 체력을 회복할 수 있습니다.");
@@ -305,12 +347,13 @@
                 Console.WriteLine("1. 휴식하기");
                 Console.WriteLine("0, 나가기\n");
 
-                int select = -1;
+                int select = 0;
                 if (CheckWrongInput(ref select, 0, 1)) Rest();
                 switch (select)
                 {
                     case 0:
-                        return;
+                        Rest();
+                        break;
                     case 1:
                         if(_character.UseGold(500))
                         {
