@@ -41,7 +41,7 @@
             Console.WriteLine("상태 보기\n캐릭터의 정보가 표시됩니다.\n");
             Console.WriteLine($"Lv. {level:D2}");
             Console.WriteLine($"{name} ( {classType} )");
-            Console.WriteLine($"공격력: {attack}{(weapon is not null ? $" (+{weapon.attack})" : "")}");
+            Console.WriteLine($"공격력: {(int)attack}{(weapon is not null ? $" (+{weapon.attack})" : "")}");
             Console.WriteLine($"방어력: {defense}{(armor is not null ? $" (+{armor.defense})" : "")}");
             Console.WriteLine($"체 력: {health}");
             Console.WriteLine($"Gold: {gold}G");
@@ -49,31 +49,47 @@
             Console.WriteLine("\n0. 나가기");
 
             int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, 0)) PrintState();
+            if (Game.CheckWrongInput(ref select, 0, 0))
+            {
+                PrintState();
+                return;
+            }
             else return;
+        }
+
+        public void PrintItemList(bool adjustFlag)
+        {
+            Console.WriteLine("[아이템 목록]");
+            for (int i = 0; i < items.Count; i++)
+            {
+                Item item = items[i];
+
+                Console.Write("- ");
+                if (adjustFlag) Console.Write($"- {i + 1} ");
+                if (CheckEquip(item)) Console.Write("[E]");
+                Console.Write($"{item.name,-10} | ");
+                if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
+                else Console.Write($"방어력 +{item.defense} | ");
+                Console.WriteLine(item.desciption);
+            }
         }
 
         public void PrintInventory()//인벤토리
         {
             Console.Clear();
             Console.WriteLine("인벤토리\n보유 중인 아이템을 관리할 수 있습니다.\n");
-            Console.WriteLine("[아이템 목록]");
-            for (int i = 0; i < items.Count; i++)
-            {
-                Item item = items[i];
-                Console.Write($"- ");
-                if (CheckEquip(item)) Console.Write("[E]");
-                Console.Write($"{item.name, -10} | ");
-                if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
-                else Console.Write($"방어력 +{item.defense} | ");
-                Console.WriteLine(item.desciption);
-            }
+
+            PrintItemList(false);
 
             Console.WriteLine("\n1. 장착 관리");
             Console.WriteLine("0. 나가기");
 
             int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, 1)) PrintInventory();
+            if (Game.CheckWrongInput(ref select, 0, 1))
+            {
+                PrintInventory();
+                return;
+            }
             if (select == 0) return;
             else AdjustInventory();
         }
@@ -83,22 +99,17 @@
             Console.Clear();
             Console.WriteLine("인벤토리 - 장착 관리\n보유 중인 아이템을 관리할 수 있습니다.");
             Console.WriteLine("해당 숫자 아이템을 선택해 착용/해제할 수 있습니다.\n");
-            Console.WriteLine("[아이템 목록]");
-            for (int i = 0; i < items.Count; i++)
-            {
-                Item item = items[i];
-                Console.Write($"- {i + 1} ");
-                if (CheckEquip(item)) Console.Write("[E]");
-                Console.Write($"{item.name, -10} | ");
-                if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
-                else Console.Write($"방어력 +{item.defense} | ");
-                Console.WriteLine(item.desciption);
-            }
+
+            PrintItemList(true);
 
             Console.WriteLine("\n0. 나가기");
 
             int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, items.Count)) AdjustInventory();
+            if (Game.CheckWrongInput(ref select, 0, items.Count))
+            {
+                AdjustInventory();
+                return;
+            }
             if (select == 0) PrintInventory();
             else EquipItem(select);
         }

@@ -73,12 +73,16 @@ namespace TextRPG
             for (int i = 0; i < dungeons.Count; i++)
             {
                 Dungeon d = dungeons[i];
-                Console.WriteLine($"{i + 1}. {d.name, -10} | 방어력 {d.recommend} 이상 권장");
+                Console.WriteLine($"{i + 1}. {d.name,-10} | 방어력 {d.recommend} 이상 권장");
             }
             Console.WriteLine("0. 나가기\n");
 
             int select = 0;
-            if (CheckWrongInput(ref select, 0, dungeons.Count)) SelectDungeon();
+            if (CheckWrongInput(ref select, 0, dungeons.Count))
+            {
+                SelectDungeon();
+                return;
+            }
             if (select == 0) return;
             else 
             { 
@@ -87,7 +91,11 @@ namespace TextRPG
                 Console.WriteLine("\n0. 나가기");
 
                 select = 0;
-                if (CheckWrongInput(ref select, 0, dungeons.Count)) SelectDungeon();
+                if (CheckWrongInput(ref select, 0, dungeons.Count))
+                {
+                    SelectDungeon();
+                    return;
+                }
                 if (select == 0) return;
             }
         }
@@ -101,7 +109,11 @@ namespace TextRPG
             Console.WriteLine("0, 나가기\n");
 
             int select = 0;
-            if (CheckWrongInput(ref select, 0, 1)) Rest();
+            if (CheckWrongInput(ref select, 0, 1))
+            {
+                Rest();
+                return;
+            }
             switch (select)
             {
                 case 0:

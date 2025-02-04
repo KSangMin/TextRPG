@@ -33,15 +33,18 @@
             Console.Clear();
             Console.WriteLine($"던전 클리어\n축하드립니다!\n{name}을 클리어했습니다.\n");
             Console.WriteLine("[탐험 결과]");
+
             Console.Write($"체력 {character.health} -> ");
             int adjust = recommend - character.GetArmor();
             character.health -= new Random().Next(minDamage + adjust, maxDamage + adjust);
             Console.WriteLine(character.health);
+
             Console.Write($"Gold {character.gold} -> ");
             int additionalRatio = new Random().Next(character.GetAttack(), character.GetAttack() * 2 + 1);
             float ratio = 1f + additionalRatio / 100f;
             character.gold += (int)(reward * ratio);
             Console.WriteLine(character.gold);
+
             character.clear++;
             if (character.IsLevelUp())
             {

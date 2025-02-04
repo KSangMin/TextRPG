@@ -25,37 +25,41 @@
             character = c;
         }
 
-        public void PrintShop()//상점
+        public void PrintItemList(bool adjustFlag) // 아이템 목록 출력
         {
-            Console.Clear();
-            Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.\n");
             Console.WriteLine("[보유 골드]");
             Console.WriteLine(character.gold + " G\n");
             Console.WriteLine("[아이템 목록]");
             for (int i = 0; i < items.Count; i++)
             {
                 Item item = items[i];
-                Console.Write($"- {item.name,-10} | ");
-                if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
-                else Console.Write($"방어력 +{item.defense} | ");
-                bool isSelled = false;
-                foreach (Item eq in character.items)
-                {
-                    if (eq.name == item.name)
-                    {
-                        isSelled = true;
-                        break;
-                    }
-                }
+
+                Console.Write("- ");
+                if (adjustFlag) Console.Write($"{i + 1} ");
+                Console.Write($"{item.name,-10} | ");
+                Console.Write(item is Weapon ? $"공격력 +{item.attack} | " : $"방어력 +{item.defense} | ");
+                bool isSelled = character.items.Exists(eq => eq.name == item.name);
                 Console.Write($"{item.desciption,-15} | {(isSelled ? "구매완료" : $"{item.price} G")}\n");
             }
+        }
+
+        public void PrintShop()//상점
+        {
+            Console.Clear();
+            Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.\n");
+
+            PrintItemList(false);
 
             Console.WriteLine("\n1. 아이템 구매");
             Console.WriteLine("2. 아이템 판매");
             Console.WriteLine("0. 나가기");
 
             int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, 2)) PrintShop();
+            if (Game.CheckWrongInput(ref select, 0, 2))
+            {
+                PrintShop();
+                return;
+            }
             switch (select)
             {
                 case 0:
@@ -74,31 +78,17 @@
             Console.Clear();
             Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.");
             Console.WriteLine("해당 숫자 아이템을 선택해 구매할 수 있습니다.\n");
-            Console.WriteLine("[보유 골드]");
-            Console.WriteLine(character.gold + " G\n");
-            Console.WriteLine("[아이템 목록]");
-            for (int i = 0; i < items.Count; i++)
-            {
-                Item item = items[i];
-                Console.Write($"- {i + 1} {item.name,-10} | ");
-                if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
-                else Console.Write($"방어력 +{item.defense} | ");
-                bool isSelled = false;
-                foreach (Item eq in character.items)
-                {
-                    if (eq.name == item.name)
-                    {
-                        isSelled = true;
-                        break;
-                    }
-                }
-                Console.Write($"{item.desciption,-15} | {(isSelled ? "구매완료" : $"{item.price} G")}\n");
-            }
+
+            PrintItemList(true);
 
             Console.WriteLine("\n0. 나가기");
 
             int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, items.Count)) SelectBuyItems();
+            if (Game.CheckWrongInput(ref select, 0, items.Count))
+            {
+                SelectBuyItems();
+                return;
+            }
             if (select == 0) PrintShop();
             else BuyItem(select);
         }
@@ -130,25 +120,17 @@
             Console.Clear();
             Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.");
             Console.WriteLine("해당 숫자 아이템을 선택해 판매할 수 있습니다.\n");
-            Console.WriteLine("[보유 골드]");
-            Console.WriteLine(character.gold + " G\n");
-            Console.WriteLine("[아이템 목록]");
-            for (int i = 0; i < character.items.Count; i++)
-            {
-                Item item = character.items[i];
-                Console.Write($"- {i + 1} ");
-                if (character.CheckEquip(item)) Console.Write("[E]");
-                Console.Write($"{item.name,-10} | ");
-                if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
-                else Console.Write($"방어력 +{item.defense} | ");
-                Console.Write(item.desciption + " | ");
-                Console.WriteLine(item.price + " G");
-            }
+
+            PrintItemList(true);
 
             Console.WriteLine("\n0. 나가기");
 
             int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, character.items.Count)) SelectSellItems();
+            if (Game.CheckWrongInput(ref select, 0, character.items.Count))
+            {
+                SelectSellItems();
+                return;
+            }
             if (select == 0) PrintShop();
             else SellItem(select);
         }
