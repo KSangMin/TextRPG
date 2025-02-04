@@ -25,31 +25,30 @@ namespace TextRPG
             };
         }
 
-        public static bool CheckWrongInput(ref int select, int minN, int maxN)//입력 예외처리
+        public static void CheckWrongInput(out int select, int minN, int maxN)//입력 예외처리
         {
-            Console.Write("\n원하시는 행동을 입력해주세요.(숫자로 입력): ");
-            bool rightInput = int.TryParse(Console.ReadLine(), out select);
+            while (true)
+            {
+                Console.Write("\n원하시는 행동을 입력해주세요.(숫자로 입력): ");
+                bool rightInput = int.TryParse(Console.ReadLine(), out select);
 
-            if (!rightInput)
-            {
-                Console.WriteLine("입력이 잘못되었습니다. 다시 입력해주세요.");
-                Thread.Sleep(500);
-                return true;
+                if (!rightInput)
+                {
+                    Console.WriteLine("입력이 잘못되었습니다. 다시 입력해주세요.");
+                    continue;
+                }
+                if (select < minN || select > maxN)
+                {
+                    Console.WriteLine($"{minN}~{maxN}의 숫자를 입력해주세요.");
+                    continue;
+                }
+                return;
             }
-            if (select < minN || select > maxN)
-            {
-                Console.WriteLine($"{minN}~{maxN}의 숫자를 입력해주세요.");
-                Thread.Sleep(500);
-                return true;
-            }
-            return false;
         }
 
         public void Select()
         {
-            int select = 0;
-            if (CheckWrongInput(ref select, 0, 5)) return;
-
+            CheckWrongInput(out int select, 0, 5);
             switch (select)
             {
                 case 0:
@@ -85,12 +84,7 @@ namespace TextRPG
             }
             Console.WriteLine("0. 나가기\n");
 
-            int select = 0;
-            if (CheckWrongInput(ref select, 0, dungeons.Count))
-            {
-                SelectDungeon();
-                return;
-            }
+            CheckWrongInput(out int select, 0, dungeons.Count);
             if (select == 0) return;
             else 
             { 
@@ -99,11 +93,7 @@ namespace TextRPG
                 Console.WriteLine("\n0. 나가기");
 
                 select = 0;
-                if (CheckWrongInput(ref select, 0, dungeons.Count))
-                {
-                    SelectDungeon();
-                    return;
-                }
+                CheckWrongInput(out select, 0, dungeons.Count);
                 if (select == 0) return;
             }
         }
@@ -116,12 +106,7 @@ namespace TextRPG
             Console.WriteLine("1. 휴식하기");
             Console.WriteLine("0, 나가기\n");
 
-            int select = 0;
-            if (CheckWrongInput(ref select, 0, 1))
-            {
-                Rest();
-                return;
-            }
+            CheckWrongInput(out int select, 0, 1);
             switch (select)
             {
                 case 0:

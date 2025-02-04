@@ -54,12 +54,7 @@
             Console.WriteLine("2. 아이템 판매");
             Console.WriteLine("0. 나가기");
 
-            int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, 2))
-            {
-                PrintShop();
-                return;
-            }
+            Game.CheckWrongInput(out int select, 0, 2);
             switch (select)
             {
                 case 0:
@@ -83,12 +78,7 @@
 
             Console.WriteLine("\n0. 나가기");
 
-            int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, items.Count))
-            {
-                SelectBuyItems();
-                return;
-            }
+            Game.CheckWrongInput(out int select, 0, items.Count);
             if (select == 0) PrintShop();
             else BuyItem(select);
         }
@@ -125,12 +115,7 @@
 
             Console.WriteLine("\n0. 나가기");
 
-            int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, character.items.Count))
-            {
-                SelectSellItems();
-                return;
-            }
+            Game.CheckWrongInput(out int select, 0, character.items.Count);
             if (select == 0) PrintShop();
             else SellItem(select);
         }

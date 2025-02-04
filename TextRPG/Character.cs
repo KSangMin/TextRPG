@@ -48,13 +48,8 @@
 
             Console.WriteLine("\n0. 나가기");
 
-            int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, 0))
-            {
-                PrintState();
-                return;
-            }
-            else return;
+            Game.CheckWrongInput(out int select, 0, 0);
+            if (select == 0) return;
         }
 
         public void PrintItemList(bool adjustFlag)
@@ -84,12 +79,7 @@
             Console.WriteLine("\n1. 장착 관리");
             Console.WriteLine("0. 나가기");
 
-            int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, 1))
-            {
-                PrintInventory();
-                return;
-            }
+            Game.CheckWrongInput(out int select, 0, 1);
             if (select == 0) return;
             else AdjustInventory();
         }
@@ -104,12 +94,7 @@
 
             Console.WriteLine("\n0. 나가기");
 
-            int select = 0;
-            if (Game.CheckWrongInput(ref select, 0, items.Count))
-            {
-                AdjustInventory();
-                return;
-            }
+            Game.CheckWrongInput(out int select, 0, items.Count);
             if (select == 0) PrintInventory();
             else EquipItem(select);
         }

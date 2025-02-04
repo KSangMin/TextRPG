@@ -12,8 +12,8 @@
             Console.WriteLine("1. 새로하기");
             Console.WriteLine("2. 이어하기");
             Console.WriteLine("0. 종료하기");
-            int select = 0;
-            while (Game.CheckWrongInput(ref select, 0, 2)) { }
+
+            Game.CheckWrongInput(out int select, 0, 2);
             switch (select)
             {
                 case 0:
