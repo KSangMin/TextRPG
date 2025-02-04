@@ -111,7 +111,17 @@
             Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.");
             Console.WriteLine("해당 숫자 아이템을 선택해 판매할 수 있습니다.\n");
 
-            PrintItemList(true);
+            for (int i = 0; i < character.items.Count; i++)
+            {
+                Item item = character.items[i];
+                Console.Write($"- {i + 1} ");
+                if (character.CheckEquip(item)) Console.Write("[E]");
+                Console.Write($"{item.name,-10} | ");
+                if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
+                else Console.Write($"방어력 +{item.defense} | ");
+                Console.Write(item.desciption + " | ");
+                Console.WriteLine(item.price + " G");
+            }
 
             Console.WriteLine("\n0. 나가기");
 
