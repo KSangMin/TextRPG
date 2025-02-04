@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace TextRPG
 {
@@ -24,7 +25,7 @@ namespace TextRPG
                 , new Dungeon(character, "어려운 던전", 17, 2500)
             };
         }
-
+        
         public static void CheckWrongInput(out int select, int minN, int maxN)//입력 예외처리
         {
             while (true)
@@ -145,11 +146,26 @@ namespace TextRPG
             }
             else
             {
-                Console.WriteLine("저장된 캐릭터가 없습니다. 캐릭터를 새로 생성했습니다.");
+                Console.WriteLine("저장된 캐릭터가 없습니다. 캐릭터를 새로 만들어야 합니다.");
+                Console.Write("당신의 이름을 알려 주세요: ");
+                string name = Console.ReadLine();
+                character = new Character(name);
             }
+            Refresh();
         }
 
-        public void DeleteCharacter()
+        public void Refresh()
+        {
+            shop = new Shop(character);
+            dungeons = new List<Dungeon>
+            {
+                new Dungeon(character, "쉬운 던전", 5, 1000)
+                , new Dungeon(character, "일반 던전", 11, 1700)
+                , new Dungeon(character, "어려운 던전", 17, 2500)
+            };
+        }
+
+        public static void DeleteCharacter()
         {
             if (File.Exists("character.xml")) File.Delete("character.xml");
         }

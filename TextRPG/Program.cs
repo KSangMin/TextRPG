@@ -4,8 +4,7 @@
     {
         static void Main(string[] args)
         {
-            string name;
-            Character user = new Character();
+            Character user = new Character("test");
             Game game = new Game(user);
 
             Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
@@ -20,9 +19,9 @@
                     Environment.Exit(0);
                     break;
                 case 1:
-                    game.DeleteCharacter();
+                    Game.DeleteCharacter();
                     Console.Write("당신의 이름을 알려 주세요: ");
-                    name = Console.ReadLine();
+                    string name = Console.ReadLine();
                     user = new Character(name);
                     game = new Game(user);
                     break;
@@ -42,8 +41,8 @@
                 Console.WriteLine("2. 인벤토리");
                 Console.WriteLine("3. 상점");
                 Console.WriteLine("4. 던전 입장");
-                Console.WriteLine("5. 휴식하기\n");
-                Console.WriteLine("0. 종료하기");
+                Console.WriteLine("5. 휴식하기");
+                Console.WriteLine("0. 종료하기\n");
 
                 game.Select();
 

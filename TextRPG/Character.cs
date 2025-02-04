@@ -2,11 +2,7 @@
 {
     public class Character
     {
-        public List<Item> items = new List<Item>
-            {
-                new Armor("천 옷", 0, 2, "활동성이 좋은 옷입니다.", 425)
-                , new Weapon("나무 몽둥이", 1, 0, "두꺼운 나무 몽둥이입니다.", 255)
-            };
+        public List<Item> items;
         public Weapon weapon;
         public Armor armor;
         public int level;
@@ -25,6 +21,11 @@
 
         public Character(string name)
         {
+            items = new List<Item>
+            {
+                new Armor("천 옷", 0, 2, "활동성이 좋은 옷입니다.", 425)
+                , new Weapon("나무 몽둥이", 1, 0, "두꺼운 나무 몽둥이입니다.", 255)
+            };
             level = 1;
             clear = 0;
             this.name = name;
@@ -96,13 +97,15 @@
 
             Game.CheckWrongInput(out int select, 0, items.Count);
             if (select == 0) PrintInventory();
-            else EquipItem(select);
+            else ToggleItem(select);
         }
 
-        public void EquipItem(int select)//무기, 방어구 장착 체크
+        public void ToggleItem(int select)//무기, 방어구 장착 체크
         {
             Item item = items[select - 1];
-            if (item is Weapon) weapon = (Weapon)item;
+            if (weapon is not null && item.name == weapon.name) weapon = null;
+            else if (armor is not null && item.name == armor.name) armor = null;
+            else if (item is Weapon) weapon = (Weapon)item;
             else if (item is Armor) armor = (Armor)item;
 
             AdjustInventory();
@@ -110,7 +113,7 @@
 
         public bool CheckEquip(Item item)
         {
-            if (item == weapon || item == armor) return true;
+            if ((weapon is not null && item.name == weapon.name) || (armor is not null && item.name == armor.name)) return true;
             return false;
         }
 
@@ -128,6 +131,23 @@
                 Console.WriteLine($"{price} Gold를 지불했습니다.");
                 Thread.Sleep(500);
                 return true;
+            }
+        }
+
+        public void GetDamage(int damage)
+        {
+            health -= damage;
+            IsDead();
+        }
+
+        public void IsDead()
+        {
+            if (health <= 0)
+            {
+                Console.Clear();
+                Console.WriteLine("죽었습니다. 안타깝네요.");
+                Game.DeleteCharacter();
+                Environment.Exit(0);
             }
         }
 

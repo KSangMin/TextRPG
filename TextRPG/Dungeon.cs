@@ -36,7 +36,7 @@
 
             Console.Write($"체력 {character.health} -> ");
             int adjust = recommend - character.GetArmor();
-            character.health -= new Random().Next(minDamage + adjust, maxDamage + adjust);
+            character.GetDamage(new Random().Next(minDamage + adjust, maxDamage + adjust));
             Console.WriteLine(character.health);
 
             Console.Write($"Gold {character.gold} -> ");
