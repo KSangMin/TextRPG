@@ -4,14 +4,34 @@
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
-            Console.Write("당신의 이름을 알려 주세요: ");
-            string name = Console.ReadLine();
-            Character user = new Character(name);
+            string name;
+            Character user = new Character();
             Game game = new Game(user);
-            game.LoadCharacter();
 
-            Console.WriteLine("환영합니다!");
+            Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
+            Console.WriteLine("1. 새로하기");
+            Console.WriteLine("2. 이어하기");
+            Console.WriteLine("0. 종료하기");
+            int select = 0;
+            while (Game.CheckWrongInput(ref select, 0, 2)) { }
+            switch (select)
+            {
+                case 0:
+                    Environment.Exit(0);
+                    break;
+                case 1:
+                    game.DeleteCharacter();
+                    Console.Write("당신의 이름을 알려 주세요: ");
+                    name = Console.ReadLine();
+                    user = new Character(name);
+                    game = new Game(user);
+                    break;
+                case 2:
+                    game.LoadCharacter();
+                    break;
+            }
+
+            Console.WriteLine($"{game.character.name}님 환영합니다!");
             Thread.Sleep(500);
             while (true)
             {
@@ -23,6 +43,7 @@
                 Console.WriteLine("3. 상점");
                 Console.WriteLine("4. 던전 입장");
                 Console.WriteLine("5. 휴식하기\n");
+                Console.WriteLine("0. 종료하기");
 
                 game.Select();
 

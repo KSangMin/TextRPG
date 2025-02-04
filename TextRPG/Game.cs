@@ -8,6 +8,11 @@ namespace TextRPG
         public Character character;
         public Shop shop;
 
+        public Game()
+        {
+
+        }
+
         public Game(Character character)
         {
             this.character = character;
@@ -43,10 +48,13 @@ namespace TextRPG
         public void Select()
         {
             int select = 0;
-            if (CheckWrongInput(ref select, 1, 5)) return;
+            if (CheckWrongInput(ref select, 0, 5)) return;
 
             switch (select)
             {
+                case 0:
+                    Environment.Exit(0);
+                    break;
                 case 1:
                     character.PrintState();
                     return;
@@ -154,6 +162,11 @@ namespace TextRPG
             {
                 Console.WriteLine("저장된 캐릭터가 없습니다. 캐릭터를 새로 생성했습니다.");
             }
+        }
+
+        public void DeleteCharacter()
+        {
+            if (File.Exists("character.xml")) File.Delete("character.xml");
         }
     }
 }

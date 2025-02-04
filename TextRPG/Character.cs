@@ -65,7 +65,7 @@
                 Item item = items[i];
 
                 Console.Write("- ");
-                if (adjustFlag) Console.Write($"- {i + 1} ");
+                if (adjustFlag) Console.Write($"{i + 1} ");
                 if (CheckEquip(item)) Console.Write("[E]");
                 Console.Write($"{item.name,-10} | ");
                 if (item is Weapon) Console.Write($"공격력 +{item.attack} | ");
